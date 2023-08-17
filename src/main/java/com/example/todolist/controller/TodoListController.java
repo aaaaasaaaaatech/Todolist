@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import com.example.todolist.entity.Todo;
 import com.example.todolist.form.TodoData;
+import com.example.todolist.form.TodoQuery;
 import com.example.todolist.repository.TodoRepository;
 import com.example.todolist.service.TodoService;
 
@@ -32,6 +33,22 @@ public class TodoListController {
 		mv.setViewName("todoList");
 		List<Todo> todoList = todoRepository.findAll();
 		mv.addObject("todoList", todoList);
+		mv.addObject("todoQuery", new TodoQuery()); // ※ Todolist4 で追加
+		return mv;
+	}
+
+	@PostMapping("/todo/query")
+	public ModelAndView queryTodo(@ModelAttribute TodoQuery todoQuery, // ①
+			BindingResult result, // ②
+			ModelAndView mv) {
+		mv.setViewName("todoList");
+		List<Todo> todoList = null;
+		if (todoService.isValid(todoQuery, result)) { // ③
+			// エラーが無ければ検索
+			todoList = todoService.doQuery(todoQuery); // ④
+		}
+		// mv.addObject("todoQuery", todoQuery); // ⑤
+		mv.addObject("todoList", todoList); // ⑥
 		return mv;
 	}
 
